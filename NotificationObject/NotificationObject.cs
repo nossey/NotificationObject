@@ -15,8 +15,11 @@ namespace NotificationObject
         public void SetProperty<T>(ref T target, T value, [CallerMemberName] string caller ="")
         {
             target = value;
+
+            if (PropertyChanged == null)
+                return;
             PropertyChangedEventArgs arg = new PropertyChangedEventArgs(caller);
-            PropertyChanged?.Invoke(this, arg);
+            PropertyChanged.Invoke(this, arg);
         }
     }
 }

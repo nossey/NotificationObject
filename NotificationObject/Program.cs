@@ -25,11 +25,11 @@ namespace NotificationObject
         int _HP;
     }
 
-    public class PlayerProj : NotificationObject
+    public class PlayerWatcher : NotificationObject
     {
         Player p;
 
-        public PlayerProj(Player player)
+        public PlayerWatcher(Player player)
         {
             p = player;
         }
@@ -40,52 +40,24 @@ namespace NotificationObject
         static void Main(string[] args)
         {
             ObservableCollection<Player> Players = new ObservableCollection<Player>();
-            ObservableCollection<PlayerProj> Result = new ObservableCollection<PlayerProj>();
-
-            Result.CollectionChanged += (sender, e) => { Console.WriteLine("Changed"); };
-            Func<Player, PlayerProj> converter = (pl) => { return new PlayerProj(pl); };
-            Players.CollectionChanged += (sender, e)=> {
-                switch(e.Action)
-                {
-                    case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                        {
-                            Result.Insert(e.NewStartingIndex, converter((Player)e.NewItems[0]));
-                        }
-                        break;
-                    case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                        {
-                            Result.Move(e.OldStartingIndex, e.NewStartingIndex);
-                        }
-                        break;
-                    case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                        {
-                            Result.RemoveAt(e.OldStartingIndex);
-                        }
-                        break;
-                    case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                        {
-                            Result[e.NewStartingIndex] = converter((Player)e.NewItems[0]);
-                        }
-                        break;
-                    case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                        {
-                            Result.Clear();
-                        }
-                        break;
-                }
-            };
-
             var player = new Player();
             var player2 = new Player();
 
-            ReadOnlyCollection<Player> Reader = new ReadOnlyCollection<Player>(Players);
+            var readonlyDispatcherCollection = CreateReadonlyDispatcherCollection<PlayerWatcher, Player>(Players, (p) =>
+            {
+                return new PlayerWatcher(p);
+            });
+            Console.WriteLine(readonlyDispatcherCollection.Count);
+
             Players.Add(player);
             Players.Add(player2);
+            Console.WriteLine(readonlyDispatcherCollection.Count);
 
-            var readonlyDispatcherCollection = CreateReadonlyDispatcherCollection<PlayerProj, Player>(Players, (p) =>
-            {
-                return new PlayerProj(p);
+            ReadonlyDispatcherCollection<PlayerWatcher> projected;
+            projected = CreateReadonlyDispatcherCollection(Players, (p) => {
+                return new PlayerWatcher(p);
             });
+
             Console.WriteLine(readonlyDispatcherCollection.Count);
             Players.Clear();
             Console.WriteLine(readonlyDispatcherCollection.Count);
