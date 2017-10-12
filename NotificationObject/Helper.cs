@@ -9,30 +9,46 @@ namespace NotificationObject
 {
     static public class Helper
     {
-        public static ReadonlyDispatcherCollection<T> CreateReadonlyDispatcherCollection<T, U>(ObservableCollection<U> source, Func<U, T> converter)
+        public static ReadonlySyncedCollection<T> CreateReadonlySyncedCollection<T, U>(ObservableCollection<U> source, Func<U, T> converter) where T : IDisposable
         {
             var target = new ObservableCollection<T>();
+
+            // Initialization
             for (int i = 0; i < source.Count; ++ i)
                 target.Add(converter(source[i]));
 
-            ReadonlyDispatcherCollection<T> collection = new ReadonlyDispatcherCollection<T>(target);
+            ReadonlySyncedCollection<T> collection = new ReadonlySyncedCollection<T>(target);
             source.CollectionChanged += (sender, e) => {
                 switch(e.Action)
                 {
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Add:
-                        target.Insert(e.NewStartingIndex, converter((U)e.NewItems[0]));
+                        {
+                            target.Insert(e.NewStartingIndex, converter((U)e.NewItems[0]));
+                        }
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Move:
-                        target.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        {
+                            target.Move(e.OldStartingIndex, e.NewStartingIndex);
+                        }
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Remove:
-                        target.RemoveAt(e.OldStartingIndex);
+                        {
+                            target[e.OldStartingIndex].Dispose();
+                            target.RemoveAt(e.OldStartingIndex);
+                        }
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Replace:
-                        target[e.NewStartingIndex] = converter((U)e.NewItems[0]);
+                        {
+                            target[e.NewStartingIndex].Dispose();
+                            target[e.NewStartingIndex] = converter((U)e.NewItems[0]);
+                        }
                         break;
                     case System.Collections.Specialized.NotifyCollectionChangedAction.Reset:
-                        target.Clear();
+                        {
+                            foreach (var item in target)
+                                item.Dispose();
+                            target.Clear();
+                        }
                         break;
                 }
             };

@@ -25,13 +25,45 @@ namespace NotificationObject
         int _HP;
     }
 
-    public class PlayerWatcher : NotificationObject
+    public class PlayerWatcher : IDisposable 
     {
         Player p;
+        PropertyChangedEventListener listener;
 
         public PlayerWatcher(Player player)
         {
             p = player;
+            listener = new PropertyChangedEventListener(player, (sender, e) => { });
+        }
+
+        public void Dispose()
+        {
+            if (p != null && listener != null)
+            {
+                listener.Dispose();
+            }
+        }
+    }
+
+    public class HPGauge : IDisposable
+    {
+        IDisposable listener;
+
+        public HPGauge(Player pl)
+        {
+            listener = new PropertyChangedEventListener(pl, (sender, e)
+                =>
+            {
+                if (e.PropertyName == "HP")
+                {
+                    Console.WriteLine("HP changed");
+                }
+            });
+        }
+
+        public void Dispose()
+        {
+            listener?.Dispose();
         }
     }
 
@@ -43,7 +75,10 @@ namespace NotificationObject
             var player = new Player();
             var player2 = new Player();
 
-            var readonlyDispatcherCollection = CreateReadonlyDispatcherCollection<PlayerWatcher, Player>(Players, (p) =>
+            var gauge = new HPGauge(player);
+            player.HP = 400;
+
+            var readonlyDispatcherCollection = CreateReadonlySyncedCollection<PlayerWatcher, Player>(Players, (p) =>
             {
                 return new PlayerWatcher(p);
             });
@@ -53,8 +88,8 @@ namespace NotificationObject
             Players.Add(player2);
             Console.WriteLine(readonlyDispatcherCollection.Count);
 
-            ReadonlyDispatcherCollection<PlayerWatcher> projected;
-            projected = CreateReadonlyDispatcherCollection(Players, (p) => {
+            ReadonlySyncedCollection<PlayerWatcher> projected;
+            projected = CreateReadonlySyncedCollection(Players, (p) => {
                 return new PlayerWatcher(p);
             });
 

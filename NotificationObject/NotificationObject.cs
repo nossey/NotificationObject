@@ -12,6 +12,13 @@ namespace NotificationObject
     {
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Set value using this method raise a PropertyChangedEventHandler
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="target"></param>
+        /// <param name="value"></param>
+        /// <param name="caller"></param>
         public void SetProperty<T>(ref T target, T value, [CallerMemberName] string caller ="")
         {
             target = value;
