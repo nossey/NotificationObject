@@ -77,6 +77,7 @@ namespace NotificationObject
             var player2 = new Player();
 
             var gauge = new HPGauge(player);
+            // gauge listens player's HP
             player.HP = 400;
 
             var readonlyDispatcherCollection = CreateReadonlySyncedCollection<PlayerWatcher, Player>(Players, (p) =>
