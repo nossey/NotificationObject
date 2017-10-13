@@ -80,26 +80,27 @@ namespace NotificationObject
             // gauge listens player's HP
             player.HP = 400;
 
-            var readonlyDispatcherCollection = CreateReadonlySyncedCollection<PlayerWatcher, Player>(Players, (p) =>
+            var readonlySyncedCollection = CreateReadonlySyncedCollection<PlayerWatcher, Player>(Players, (p) =>
             {
                 return new PlayerWatcher(p);
             });
-            Console.WriteLine(readonlyDispatcherCollection.Count);
+            Console.WriteLine(readonlySyncedCollection.Count);
 
+            // readonlyDi
             Players.Add(player);
             Players.Add(player2);
-            Console.WriteLine(readonlyDispatcherCollection.Count);
+            Console.WriteLine(readonlySyncedCollection.Count);
 
             ReadonlySyncedCollection<PlayerWatcher> projected;
             projected = CreateReadonlySyncedCollection(Players, (p) => {
                 return new PlayerWatcher(p);
             });
 
-            Console.WriteLine(readonlyDispatcherCollection.Count);
+            Console.WriteLine(readonlySyncedCollection.Count);
             Players.Clear();
-            Console.WriteLine(readonlyDispatcherCollection.Count);
+            Console.WriteLine(readonlySyncedCollection.Count);
             Players.Add(player);
-            Console.WriteLine(readonlyDispatcherCollection.Count);
+            Console.WriteLine(readonlySyncedCollection.Count);
 
             Console.ReadKey();
         }
