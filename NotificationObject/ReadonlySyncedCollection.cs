@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace NotificationObject
 {
-    public class ReadonlySyncedCollection<T> : ReadOnlyCollection<T>, INotifyCollectionChanged, IDisposable where T : IDisposable
+    public class ReadonlySyncedCollection<T> : ReadOnlyCollection<T>, IDisposable where T : IDisposable
     {
         #region Declaration
         #endregion
@@ -20,16 +20,9 @@ namespace NotificationObject
         #endregion
 
         #region Properties
-
-        public event NotifyCollectionChangedEventHandler CollectionChanged;
-
         #endregion
 
         #region Public methods
-
-        public ReadonlySyncedCollection() : base(null)
-        {
-        }
 
         public ReadonlySyncedCollection(IList<T> list) : base(list)
         {

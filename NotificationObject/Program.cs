@@ -41,6 +41,7 @@ namespace NotificationObject
             if (p != null && listener != null)
             {
                 listener.Dispose();
+                Console.WriteLine("Disposed");
             }
         }
     }
